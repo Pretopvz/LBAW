@@ -122,56 +122,18 @@ CREATE TABLE TagsProducts (
 
 -- Indexes
 
-CREATE INDEX idPerson
-ON Person USING btree (idPerson);
+CREATE INDEX product_name ON "Product" USING gin(to_tsvector(english,name));
 
-CREATE INDEX idPerson
-ON SystemAdmnistrator USING btree (idPerson);
+CREATE INDEX product_price ON "Product" USING btree(price);
 
-CREATE INDEX idPerson
-ON Client USING btree (idPerson);
+CREATE INDEX email ON "Client" USING btree(email);
 
-CREATE INDEX idProduct
-ON Product USING btree (idProduct);
+CREATE INDEX rating ON "Rate" USING btree(rating);
 
-CREATE INDEX idProduct
-ON Rate USING btree (idProduct);
+CREATE INDEX wish_product ON "WishList" USING btree(idProduct);
 
-CREATE INDEX idPerson
-ON Rate USING btree (idPerson);
+CREATE INDEX person_name ON "Person" USING gin(to_tsvector(name));
 
-CREATE INDEX idPerson
-ON ShoppingCart USING btree (idPerson);
-
-CREATE INDEX idProduct
-ON ShoppingCart USING btree (idProduct);
-
-CREATE INDEX idCheckout
-ON Checkout USING btree (idCheckout);
-
-CREATE INDEX idCheckout
-ON Purchase USING btree (idCheckout);
-
-CREATE INDEX idProduct
-ON Purchase USING btree (idProduct);
-
-CREATE INDEX idSupportTicket
-ON SupportTicket USING btree (idSupportTicket);
-
-CREATE INDEX idProduct
-ON WishList USING btree (idProduct);
-
-CREATE INDEX idPerson
-ON WishList USING btree (idPerson);
-
-CREATE INDEX idTags
-ON Tags USING btree (idTags);
-
-CREATE INDEX idProduct
-ON TagsProducts USING btree (idProduct);
-
-CREATE INDEX idTags
-ON TagsProducts USING btree (idTags);
 
 -- Triggers
 
@@ -189,27 +151,3 @@ BEFORE INSERT ON Purchase
 EXECUTE PROCEDURE decStock();
 
 
-CREATE OR REPLACE FUNCTION deletePurchase() RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM Purchase WHERE OLD.idCheckout =
-  Purchase.idCheckout;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS deletePurchase ON Checkout;
-CREATE TRIGGER deletePurchase
-BEFORE DELETE ON Checkout
-EXECUTE PROCEDURE deletePurchase();
-
-
-CREATE OR REPLACE FUNCTION deletePerson() RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM Client WHERE OLD.idPerson =
-  Client.idPerson;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS deletePerson ON Person;
-CREATE TRIGGER deletePerson
-BEFORE DELETE ON Client
-EXECUTE PROCEDURE deletePerson();
